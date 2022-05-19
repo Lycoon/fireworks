@@ -2,12 +2,13 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include "particle-spawner.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-const unsigned int WINDOW_WIDTH = 800;
-const unsigned int WINDOW_HEIGHT = 600;
+const unsigned int WINDOW_WIDTH = 1920;
+const unsigned int WINDOW_HEIGHT = 1080;
 
 int main()
 {
@@ -15,10 +16,6 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Fireworks", NULL, NULL);
     if (window == NULL)
@@ -29,6 +26,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSwapInterval(1);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -36,12 +34,21 @@ int main()
         return -1;
     }
 
+    double lastTime = glfwGetTime();
+    ParticleSpawner spawner(glm::vec3(0, 0, 0));
+    spawner.init();
+
     while (!glfwWindowShouldClose(window))
     {
+        double currentTime = glfwGetTime();
+        double delta = currentTime - lastTime;
+        lastTime = currentTime;
+
         processInput(window);
 
         glClearColor(0.7f, 0, 0, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        spawner.render(delta);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
