@@ -1,11 +1,14 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <Windows.h>
+#include <gl/GLU.h>
+#include <gl/GL.h>
 
 #include <iostream>
-#include "particle-spawner.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void render(GLuint vertexbuffer);
 
 const unsigned int WINDOW_WIDTH = 1920;
 const unsigned int WINDOW_HEIGHT = 1080;
@@ -34,21 +37,28 @@ int main()
         return -1;
     }
 
-    double lastTime = glfwGetTime();
-    ParticleSpawner spawner(glm::vec3(0, 0, 0));
-    spawner.init();
+    static const GLfloat g_vertex_buffer_data[] = {
+       -1.0f, -1.0f, 0.0f,
+       1.0f, -1.0f, 0.0f,
+       0.0f,  1.0f, 0.0f,
+    };
+
+    GLuint VertexArrayID;
+    glGenVertexArrays(1, &VertexArrayID);
+    glBindVertexArray(VertexArrayID);
+
+    GLuint vertexbuffer;
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     while (!glfwWindowShouldClose(window))
     {
-        double currentTime = glfwGetTime();
-        double delta = currentTime - lastTime;
-        lastTime = currentTime;
-
         processInput(window);
 
-        glClearColor(0.7f, 0, 0, 1.0f);
+        glClearColor(0, 0.6f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        spawner.render(delta);
+        render(vertexbuffer);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -67,4 +77,13 @@ void processInput(GLFWwindow* window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void render(GLuint vertexbuffer)
+{
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDisableVertexAttribArray(0);
 }
