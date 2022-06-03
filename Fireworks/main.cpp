@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <gl/GLU.h>
 #include <gl/GL.h>
+#include <glm/gtx/transform.hpp>
 
 #include <iostream>
 
@@ -10,8 +11,12 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void render(GLuint vertexbuffer);
 
-const unsigned int WINDOW_WIDTH = 1920;
-const unsigned int WINDOW_HEIGHT = 1080;
+const unsigned int SCREEN_W = 800;
+const unsigned int SCREEN_H = 600;
+
+const float FOV = 45.0;
+const float NEAR_CLIP = 1.0;
+const float FAR_CLIP = 100.0;
 
 int main()
 {
@@ -20,7 +25,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Fireworks", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_W, SCREEN_H, "Fireworks", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -37,11 +42,7 @@ int main()
         return -1;
     }
 
-    static const GLfloat g_vertex_buffer_data[] = {
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
-    };
+    auto projectionMatrix = glm::perspective(FOV, (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
 
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
