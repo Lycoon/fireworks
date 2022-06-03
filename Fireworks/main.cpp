@@ -4,13 +4,19 @@
 #include <gl/GLU.h>
 #include <gl/GL.h>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "camera.h"
+#include "shader.h"
+#include "utils.h"
 
 #include <iostream>
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void render(GLuint vertexbuffer, GLuint colorbuffer, Shader cubeShader);
 void processInput(GLFWwindow* window);
-void render(GLuint vertexbuffer);
 
 const unsigned int SCREEN_W = 800;
 const unsigned int SCREEN_H = 600;
@@ -19,9 +25,7 @@ const float FOV = 45.0;
 const float NEAR_CLIP = 1.0;
 const float FAR_CLIP = 100.0;
 
-const float FOV = 45.0;
-const float NEAR_CLIP = 1.0;
-const float FAR_CLIP = 100.0;
+Camera* camera;
 
 int main()
 {
@@ -48,8 +52,17 @@ int main()
         return -1;
     }
 
-    auto projectionMatrix = glm::perspective(FOV, (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
+    // Instantiating camera
+    camera = new Camera();
+    auto projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
+
+    // Shaders
+    Shader cubeShader("cube.vert", "cube.frag");
+
+    // Buffers
     GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
@@ -57,15 +70,40 @@ int main()
     GLuint vertexbuffer;
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_cube), g_vertex_cube, GL_STATIC_DRAW);
 
+    GLuint colorbuffer;
+    glGenBuffers(1, &colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_cube), g_color_cube, GL_STATIC_DRAW);
+
+    glClearColor(0, 0.6f, 0.8f, 1.0f);
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glClearColor(0, 0.6f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        render(vertexbuffer);
+        auto worldToView = camera->getWorldToViewMatrix();
+        std::cout << "worldToView: " << glm::to_string(worldToView) << std::endl;
+        std::cout << "camera position: " << glm::to_string(camera->getPosition()) << std::endl;
+
+        auto modelView = glm::mat4(1.0);
+        auto mvp = projection * worldToView * modelView;
+        std::cout << "mvp: " << glm::to_string(mvp) << std::endl;
+
+        GLuint mvpLocation = glGetUniformLocation(cubeShader.id, "MVP");
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
+
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+        glDisableVertexAttribArray(0);
+
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+        cubeShader.use();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -77,19 +115,21 @@ int main()
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (action != GLFW_PRESS)
+    if (action != GLFW_REPEAT)
         return;
 
     switch (key)
     {
     case GLFW_KEY_W:
         std::cout << "Z pressed" << std::endl;
+        camera->moveForward(1);
         break;
     case GLFW_KEY_A:
         std::cout << "Q pressed" << std::endl;
         break;
     case GLFW_KEY_S:
         std::cout << "S pressed" << std::endl;
+        camera->moveForward(-1);
         break;
     case GLFW_KEY_D:
         std::cout << "D pressed" << std::endl;
@@ -105,13 +145,4 @@ void processInput(GLFWwindow* window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-}
-
-void render(GLuint vertexbuffer)
-{
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDisableVertexAttribArray(0);
 }
