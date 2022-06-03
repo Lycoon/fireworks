@@ -134,11 +134,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ClCompile Include="..\..\OpenGL\glad\src\glad.c" />
+=======
+    <ClCompile Include="..\..\..\..\..\..\OpenGL\glad.c" />
+    <ClCompile Include="Camera.cpp" />
+>>>>>>> f9713d64bea7f66b52b95a75a3bcc946f9c6e28f
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -21,12 +21,19 @@
     <ClCompile Include="shader.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\..\OpenGL\glad\src\glad.c">
+=======
+    <ClCompile Include="Camera.cpp">
+>>>>>>> f9713d64bea7f66b52b95a75a3bcc946f9c6e28f
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>

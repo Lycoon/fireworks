@@ -7,12 +7,17 @@
 
 #include <iostream>
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void render(GLuint vertexbuffer);
 
 const unsigned int SCREEN_W = 800;
 const unsigned int SCREEN_H = 600;
+
+const float FOV = 45.0;
+const float NEAR_CLIP = 1.0;
+const float FAR_CLIP = 100.0;
 
 const float FOV = 45.0;
 const float NEAR_CLIP = 1.0;
@@ -34,6 +39,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
     glfwSwapInterval(1);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -67,6 +73,27 @@ int main()
 
     glfwTerminate();
     return 0;
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action != GLFW_PRESS)
+        return;
+
+    switch (key)
+    {
+    case GLFW_KEY_W:
+        std::cout << "Z pressed" << std::endl;
+        break;
+    case GLFW_KEY_A:
+        std::cout << "Q pressed" << std::endl;
+        break;
+    case GLFW_KEY_S:
+        std::cout << "S pressed" << std::endl;
+        break;
+    case GLFW_KEY_D:
+        std::cout << "D pressed" << std::endl;
+    }
 }
 
 void processInput(GLFWwindow* window)
