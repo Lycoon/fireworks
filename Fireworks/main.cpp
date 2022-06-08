@@ -18,14 +18,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void render(GLuint vertexbuffer, GLuint colorbuffer, Shader cubeShader);
 void processInput(GLFWwindow* window);
 
-const unsigned int SCREEN_W = 800;
-const unsigned int SCREEN_H = 600;
+float SCREEN_W = 800.0;
+float SCREEN_H = 600.0;
 
 const float FOV = 45.0;
 const float NEAR_CLIP = 1.0;
 const float FAR_CLIP = 100.0;
 
 Camera* camera;
+glm::highp_mat4 projection;
 
 int main()
 {
@@ -56,8 +57,8 @@ int main()
     glDepthFunc(GL_LESS);
 
     // Instantiating camera
-    camera = new Camera();
-    auto projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
+    camera = new Camera(glm::vec3(0, 2, -8));
+    projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
 
     // Shaders
     Shader cubeShader("cube.vert", "cube.frag");
@@ -84,12 +85,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         auto worldToView = camera->getWorldToViewMatrix();
-        std::cout << "worldToView: " << glm::to_string(worldToView) << std::endl;
-        std::cout << "camera position: " << glm::to_string(camera->getPosition()) << std::endl;
-
         auto modelView = glm::mat4(1.0);
         auto mvp = projection * worldToView * modelView;
-        std::cout << "mvp: " << glm::to_string(mvp) << std::endl;
 
         GLuint mvpLocation = glGetUniformLocation(cubeShader.id, "MVP");
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
@@ -144,5 +141,9 @@ void processInput(GLFWwindow* window)
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+    SCREEN_W = width;
+    SCREEN_H = height;
+    projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
+
     glViewport(0, 0, width, height);
 }

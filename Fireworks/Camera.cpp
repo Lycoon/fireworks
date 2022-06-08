@@ -1,7 +1,7 @@
 #include "camera.h"
 
 Camera::Camera() 
-	: Camera(glm::vec3(0.0, 2.0, -8.0))
+	: Camera(glm::vec3(0.0, 0.0, -8.0))
 {}
 
 Camera::Camera(glm::vec3 position) : 
