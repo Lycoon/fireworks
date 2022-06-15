@@ -1,5 +1,6 @@
 #pragma once
 #include <gl/GL.h>
+#include <math.h>
 
 static const GLfloat g_color_cube[] = {
     0.583f,  0.771f,  0.014f,
@@ -84,3 +85,8 @@ static const GLfloat g_vertex_triangle[] = {
    1.0f, -1.0f, 0.0f,
    0.0f,  1.0f, 0.0f,
 };
+
+float clamp(float x, float upper, float lower)
+{
+    return std::min(upper, std::max(x, lower));
+}
