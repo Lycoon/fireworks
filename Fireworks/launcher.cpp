@@ -16,7 +16,7 @@ void Launcher::update()
 	if (time >= delay)
 	{
 		// Firing firework
-		Firework firework(position, 50.0f);
+		Firework firework(position, 30.0f, 0.8f);
 		launched.push_back(firework);
 
 		// Resetting for next launch

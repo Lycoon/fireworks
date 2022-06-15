@@ -10,7 +10,7 @@ class Firework
 {
 public:
 	Firework();
-	Firework(glm::vec3 position, float launchForce);
+	Firework(glm::vec3 position, float launchForce, float mass);
 
 	unsigned int getId() const;
 	void update(float deltaTime);
@@ -19,9 +19,10 @@ private:
 	glm::vec3 position;
 	glm::vec3 velocity;
 
-	unsigned int id;
 	float mass;
 	float launchForce;
+	float launchRandomness;
 
+	unsigned int id;
 	static unsigned int fireworksCount;
 };

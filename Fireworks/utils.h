@@ -1,4 +1,5 @@
 #pragma once
+
 #include <gl/GL.h>
 #include <math.h>
 
@@ -81,9 +82,16 @@ static const GLfloat g_vertex_cube[] = {
 };
 
 static const GLfloat g_vertex_triangle[] = {
-   -1.0f, -1.0f, 0.0f,
-   1.0f, -1.0f, 0.0f,
-   0.0f,  1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+    0.0f,  1.0f, 0.0f,
+};
+
+static const GLfloat quad_vertex[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    -0.5f, 0.5f, 0.0f,
+    0.5f, 0.5f, 0.0f,
 };
 
 float clamp(float x, float upper, float lower)
