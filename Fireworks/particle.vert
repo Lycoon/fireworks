@@ -1,7 +1,8 @@
 #version 460 core
 
-layout(location = 0) in vec3 position; // per vert: position
-layout(location = 1) in vec3 color;    // per vert: color
+layout(location = 0) in vec3 vertices;  // per vert: billboard position
+layout(location = 1) in vec3 position;  // per quad: position
+layout(location = 2) in vec3 color;     // per quad: color
 
 in vec3 bdpos;		                   // per inst: bill board pos
 in vec3 rgb;		                   // per inst: colour

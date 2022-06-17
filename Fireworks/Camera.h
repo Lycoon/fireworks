@@ -15,6 +15,7 @@ public:
 	glm::vec3 getPosition() const;
 	glm::vec3 getDirection() const;
 
+	void moveUp(float axis);
 	void moveForward(float axis);
 	void moveLeft(float axis);
 	void rotate(float yaw, float pitch);

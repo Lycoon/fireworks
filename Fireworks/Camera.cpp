@@ -55,6 +55,11 @@ void Camera::rotate(float yaw, float pitch)
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 }
 
+void Camera::moveUp(float axis)
+{
+	position += UP * getSpeed() * axis;
+}
+
 void Camera::moveLeft(float axis)
 {
 	position += glm::normalize(glm::cross(direction, UP)) * getSpeed() * axis;
