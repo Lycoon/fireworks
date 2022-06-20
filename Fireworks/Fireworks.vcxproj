@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\OpenGL\glfw-3.3.7.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\OpenGL\glfw-3.3.7.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Hugo\Documents\Development\OpenGL\glfw-3.3.7.bin.WIN64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Hugo\Documents\Development\OpenGL\glfw-3.3.7.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\OpenGL\glad;C:\OpenGL\glm;C:\Users\Hugo\Documents\Development\OpenGL\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Hugo\Documents\Development\OpenGL\glad\include;C:\Users\Hugo\Documents\Development\OpenGL\glm\glm;C:\Users\Hugo\Documents\Development\OpenGL\glfw-3.3.7.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,7 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\OpenGL\glad.c" />
+    <ClCompile Include="..\..\OpenGL\glad.c" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="launcher.cpp" />

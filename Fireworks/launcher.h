@@ -11,7 +11,6 @@
 
 static const unsigned int maxParticles = 100000;
 static const float GRAVITY = 9.81f;
-static unsigned int particlesCount = 100;
 
 struct Particle {
 	glm::vec3 pos, speed;
@@ -33,15 +32,18 @@ public:
 
 	void sortParticles();
 	int findUnusedParticle();
+	void simulate(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
 	void update(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
+
+	static unsigned int particlesCount;
 
 private:
 	std::unique_ptr<Particle[]> particles{ new Particle[maxParticles] };
 	int lastUsedId = 0;
 
-	float delay = 60.0f; // in seconds
+	float delay = 0.2f; // in seconds
 	float time = 0.0f;
-	float spread = 1.5f;
+	float spread = 3.5f;
 	float launchSpeed = 25.0f;
 
 	glm::vec3 position;

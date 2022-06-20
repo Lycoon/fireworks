@@ -26,9 +26,10 @@ float FOV = 45.0f;
 float SENSITIVITY = 0.1f;
 
 const float NEAR_CLIP = 1.0f;
-const float FAR_CLIP = 100.0f;
+const float FAR_CLIP = 200.0f;
 
 double lastXPos = 0, lastYPos = 0, yaw = 0, pitch = 0, xPos, yPos;
+unsigned int Launcher::particlesCount = 0;
 
 Camera* camera;
 glm::highp_mat4 projection;
@@ -67,20 +68,23 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Instantiating camera
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // Camera
     camera = new Camera(glm::vec3(0, 2.0f, -8.0f));
     projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
 
     // Shaders
-    //Shader cubeShader("cube.vert", "cube.frag");
     Shader particleShader("particle.vert", "particle.frag");
+
+    GLuint cameraRightId = glGetUniformLocation(particleShader.id, "cameraRight");
+    GLuint cameraUpId = glGetUniformLocation(particleShader.id, "cameraUp");
+    GLuint viewProjId = glGetUniformLocation(particleShader.id, "VP");
 
     GLfloat* particle_position = new GLfloat[maxParticles * 4];
     GLubyte* particle_color = new GLubyte[maxParticles * 4];
-
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
 
     GLuint billboard_vertex_buffer;
     glGenBuffers(1, &billboard_vertex_buffer);
@@ -118,7 +122,7 @@ int main()
 
     Launcher launcher;
 
-    glClearColor(0, 0.6f, 0.8f, 1.0f);
+    glClearColor(0, 0.1f, 0.2f, 0.8f);
     while (!glfwWindowShouldClose(window))
     {
         Camera::updateDeltaTime();
@@ -131,11 +135,7 @@ int main()
         auto modelMatrix = glm::mat4(1.0);
         auto viewMatrix = camera->getWorldToViewMatrix();
         auto vp = projection * viewMatrix;
-        auto mvp = vp * modelMatrix;
-
-        //float size = 1.0f;
-        //auto camRight = glm::vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
-        //auto camUp = glm::vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+        // auto mvp = vp * modelMatrix;
 
         //auto pos = glm::vec3(0.0f, 3.0f, 0.0f);
         //auto v1 = vp * glm::vec4(pos + camRight * 0.5f * size + camUp * -0.5f * size, 1.0f);
@@ -146,23 +146,28 @@ int main()
         //GLuint mvpLocation = glGetUniformLocation(cubeShader.id, "MVP");
         //glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
-        GLuint mvpLocation = glGetUniformLocation(particleShader.id, "MVP");
-        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
-
         // Drawing
 
         //glBindVertexArray(cubeVAO);
         //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
+        // Updating particle position buffer
         glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
-        glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-        glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * sizeof(GLfloat) * 4, particle_position);
+        glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, Launcher::particlesCount * sizeof(GLfloat) * 4, particle_position);
 
+        // Updating particle color buffer
         glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
-        glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
-        glBufferSubData(GL_ARRAY_BUFFER, 0, particlesCount * sizeof(GLubyte) * 4, particle_color);
+        glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, Launcher::particlesCount * sizeof(GLubyte) * 4, particle_color);
         
+        glEnable(GL_BLEND);
         particleShader.use();
+
+        // Shader uniforms
+        glUniform3f(cameraRightId, viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+        glUniform3f(cameraUpId, viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+        glUniformMatrix4fv(viewProjId, 1, GL_FALSE, &vp[0][0]);
 
         // Quad vertices
         glEnableVertexAttribArray(0);
@@ -183,7 +188,7 @@ int main()
         glVertexAttribDivisor(1, 1); // 1 position for each quad
         glVertexAttribDivisor(2, 1); // 1 color for each quad
 
-        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, particlesCount);
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, Launcher::particlesCount);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -192,6 +197,14 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    delete[] particle_position;
+    delete[] particle_color;
+
+    glDeleteBuffers(1, &particles_color_buffer);
+    glDeleteBuffers(1, &particles_position_buffer);
+    glDeleteBuffers(1, &billboard_vertex_buffer);
+    glDeleteVertexArrays(1, &VAO);
 
     glfwTerminate();
     return 0;

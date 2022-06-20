@@ -1,20 +1,24 @@
 #version 460 core
 
-layout(location = 0) in vec3 vertices;  // per vert: billboard position
-layout(location = 1) in vec3 position;  // per quad: position
-layout(location = 2) in vec3 color;     // per quad: color
+layout(location = 0) in vec3 vertices;
+layout(location = 1) in vec4 particleInfo;
+layout(location = 2) in vec4 color;
 
-in vec3 bdpos;		                   // per inst: bill board pos
-in vec3 rgb;		                   // per inst: colour
-in float size;		                   // per inst: size
-in float angle;		                   // per inst: angle
+out vec4 fragmentColor;
 
-out vec3 fragmentColor;
-
-uniform mat4 MVP;
+uniform vec3 cameraRight;
+uniform vec3 cameraUp;
+uniform mat4 VP;
 
 void main()
 {
-    gl_Position = MVP * vec4(position, 1);
-    fragmentColor = color;
+	float particleSize = particleInfo.w;
+	vec3 particleCenter = particleInfo.xyz;
+	
+	vec3 vertexPosition = particleCenter 
+		+ cameraRight * vertices.x * particleSize 
+		+ cameraUp * vertices.y * particleSize;
+
+	gl_Position = VP * vec4(vertexPosition, 1.0f);
+	fragmentColor = color;
 }

@@ -1,8 +1,8 @@
 #version 460 core
 
-in vec3 fragmentColor;
+in vec4 fragmentColor;
 
-out vec3 color;
+out vec4 color;
 
 void main()
 {
