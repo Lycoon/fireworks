@@ -1,8 +1,8 @@
 #include "camera.h"
 
-float Camera::currentFrame = 0.0;
-float Camera::deltaTime = 0.0;
-float Camera::lastFrame = 0.0;
+float Camera::currentFrame = 0.0f;
+float Camera::deltaTime = 0.0f;
+float Camera::lastFrame = 0.0f;
 
 void Camera::updateDeltaTime() {
 	currentFrame = glfwGetTime();
@@ -11,13 +11,13 @@ void Camera::updateDeltaTime() {
 }
 
 Camera::Camera() 
-	: Camera(glm::vec3(0.0, 0.0, 8.0))
+	: Camera(glm::vec3(0.0f, 0.0f, 0.0f))
 {}
 
 Camera::Camera(glm::vec3 position) : 
 	position(position),
-	direction(0.0, 0.0, -1.0),
-	UP(0.0, 1.0, 0.0),
+	direction(0.0f, 0.1f, 1.0f),
+	UP(0.0f, 1.0f, 0.0f),
 	speed(25.0f)
 {}
 

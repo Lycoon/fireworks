@@ -15,8 +15,9 @@ static const float GRAVITY = 9.81f;
 struct Particle {
 	glm::vec3 pos, speed;
 	unsigned char r, g, b, a;
-	float size, angle, weight;
+	float size;
 	float life;
+	bool isLaunching;
 	float cameraDst;
 
 	bool operator<(const Particle& right) const {
@@ -30,10 +31,15 @@ public:
 	Launcher();
 	Launcher(glm::vec3 position);
 
-	void sortParticles();
-	int findUnusedParticle();
+	void spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, bool isLaunching);
+	void launchFirework();
+	void explode(Particle& p);
+
 	void simulate(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
 	void update(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
+
+	void sortParticles();
+	int findUnusedParticle();
 
 	static unsigned int particlesCount;
 
@@ -43,8 +49,10 @@ private:
 
 	float delay = 0.2f; // in seconds
 	float time = 0.0f;
-	float spread = 3.5f;
-	float launchSpeed = 25.0f;
+
+	float explosionSpread = 25.0f;
+	float launchSpread = 10.0f;
+	float launchSpeed = 70.0f;
 
 	glm::vec3 position;
 };

@@ -16,7 +16,6 @@
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void render(GLuint vertexbuffer, GLuint colorbuffer, Shader cubeShader);
 void updateCameraRotation(GLFWwindow* window);
 void processInput(GLFWwindow* window);
 
@@ -26,9 +25,10 @@ float FOV = 45.0f;
 float SENSITIVITY = 0.1f;
 
 const float NEAR_CLIP = 1.0f;
-const float FAR_CLIP = 200.0f;
+const float FAR_CLIP = 500.0f;
 
-double lastXPos = 0, lastYPos = 0, yaw = 0, pitch = 0, xPos, yPos;
+double lastXPos = SCREEN_W / 2, lastYPos = SCREEN_H / 2;
+double yaw = 0, pitch = 0, xPos, yPos;
 unsigned int Launcher::particlesCount = 0;
 
 Camera* camera;
@@ -73,7 +73,7 @@ int main()
     glBindVertexArray(VAO);
 
     // Camera
-    camera = new Camera(glm::vec3(0, 2.0f, -8.0f));
+    camera = new Camera(glm::vec3(0.0f, 120.0f, -430.0f));
     projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
 
     // Shaders
@@ -101,25 +101,6 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 
-    /*
-    // Cube
-    GLuint cubeVAO, cube_vert, cube_color_buffer;
-    glGenVertexArrays(1, &cubeVAO);
-    glBindVertexArray(cubeVAO);
-
-    glGenBuffers(1, &cube_vert);
-    glGenBuffers(1, &cube_color_buffer);
-
-    glBindBuffer(GL_ARRAY_BUFFER, cube_vert);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, cube_color_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cube_color), cube_color, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(1);*/
-
     Launcher launcher;
 
     glClearColor(0, 0.1f, 0.2f, 0.8f);
@@ -127,6 +108,9 @@ int main()
     {
         Camera::updateDeltaTime();
         launcher.update(*camera, particle_position, particle_color);
+
+        std::cout << "pos: " << glm::to_string(camera->getPosition()) << std::endl;
+        std::cout << "dir: " << glm::to_string(camera->getDirection()) << std::endl;
 
         processInput(window);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -136,20 +120,6 @@ int main()
         auto viewMatrix = camera->getWorldToViewMatrix();
         auto vp = projection * viewMatrix;
         // auto mvp = vp * modelMatrix;
-
-        //auto pos = glm::vec3(0.0f, 3.0f, 0.0f);
-        //auto v1 = vp * glm::vec4(pos + camRight * 0.5f * size + camUp * -0.5f * size, 1.0f);
-        //auto v2 = vp * glm::vec4(pos + camRight * 0.5f * size + camUp * 0.5f * size, 1.0f);
-        //auto v3 = vp * glm::vec4(pos + camRight * -0.5f * size + camUp * -0.5f * size, 1.0f);
-        //auto v4 = vp * glm::vec4(pos + camRight * -0.5f * size + camUp * 0.5f * size, 1.0f);
-
-        //GLuint mvpLocation = glGetUniformLocation(cubeShader.id, "MVP");
-        //glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(mvp));
-
-        // Drawing
-
-        //glBindVertexArray(cubeVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
         // Updating particle position buffer
         glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
@@ -237,20 +207,20 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 
     // Camera controls
-    updateCameraRotation(window);
+    // updateCameraRotation(window);
 
     if (heldKeys[GLFW_KEY_SPACE])
-        camera->moveUp(0.4f);
+        camera->moveUp(2.0f);
     if (heldKeys[GLFW_KEY_LEFT_SHIFT])
-        camera->moveUp(-0.4f);
+        camera->moveUp(-2.0f);
     if (heldKeys[GLFW_KEY_W])
-        camera->moveForward(0.7f);
+        camera->moveForward(2.0f);
     if (heldKeys[GLFW_KEY_S])
-        camera->moveForward(-0.7f);
+        camera->moveForward(-2.0f);
     if (heldKeys[GLFW_KEY_D])
-        camera->moveLeft(0.5f);
+        camera->moveLeft(1.5f);
     if (heldKeys[GLFW_KEY_A])
-        camera->moveLeft(-0.5f);
+        camera->moveLeft(-1.5f);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

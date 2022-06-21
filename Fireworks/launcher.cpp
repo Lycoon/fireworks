@@ -15,10 +15,11 @@ Launcher::Launcher(glm::vec3 position)
 	for (int i = 0; i < maxParticles; i++) {
 		particles[i].life = -1.0f;
 		particles[i].cameraDst = -1.0f;
+		particles[i].isLaunching = false;
 	}
 }
 
-void Launcher::simulate(Camera &camera, GLfloat* particle_position, GLubyte* particle_color)
+void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* particle_color)
 {
 	float deltaTime = Camera::getDeltaTime();
 	particlesCount = 0;
@@ -27,10 +28,11 @@ void Launcher::simulate(Camera &camera, GLfloat* particle_position, GLubyte* par
 	{
 		Particle& p = particles[i];
 
-		// If particle still alive
 		if (p.life > 0.0f)
 		{
-			p.speed += glm::vec3(0.0f, -GRAVITY, 0.0f) * deltaTime * 0.5f;
+			// Alive particle
+
+			p.speed += glm::vec3(0.0f, -GRAVITY, 0.0f) * deltaTime;
 			p.pos += p.speed * deltaTime;
 			p.cameraDst = glm::distance(p.pos, camera.getPosition());
 
@@ -49,8 +51,70 @@ void Launcher::simulate(Camera &camera, GLfloat* particle_position, GLubyte* par
 			p.life -= deltaTime;
 		}
 		else
+		{
+			// Particle just died
+			//std::cout << p.isLaunching << " ";
+
+			if (p.isLaunching)
+			{
+				p.isLaunching = false;
+				explode(p);
+			}
+
 			p.cameraDst = -1.0f;
+		}
 	}
+}
+
+void Launcher::spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, bool isLaunching)
+{
+	int idx = findUnusedParticle();
+
+	particles[idx].pos = position;
+	particles[idx].speed = speed;
+	particles[idx].r = color.r;
+	particles[idx].g = color.g;
+	particles[idx].b = color.b;
+	particles[idx].a = color.a;
+	particles[idx].size = size;
+	particles[idx].life = life;
+	particles[idx].isLaunching = isLaunching;
+}
+
+void Launcher::explode(Particle &p)
+{
+	std::cout << "Boom!" << std::endl;
+	for (int i = 0; i < 50; i++)
+	{
+		float randX = getRandomNumber(-explosionSpread, explosionSpread);
+		float randY = getRandomNumber(-explosionSpread, explosionSpread);
+		float randZ = getRandomNumber(-explosionSpread, explosionSpread);
+
+		spawnParticle(
+			p.pos,
+			glm::vec3(randX, randY, randZ),
+			glm::vec4(p.r, p.g, p.b, p.a),
+			1.5f,
+			2.0f,
+			false
+		);
+	}
+}
+
+void Launcher::launchFirework()
+{
+	std::cout << "Launching..." << std::endl;
+	float randX = getRandomNumber(-launchSpread, launchSpread);
+	float randZ = getRandomNumber(-launchSpread, launchSpread);
+
+	spawnParticle(
+		position,
+		glm::vec3(randX, launchSpeed, randZ),
+		glm::vec4((float)(rand() % 256), (float)(rand() % 256), (float)(rand() % 256), (float)((rand() % 256) / 3)),
+		1.5f,
+		7.0f, // delay before exploding
+		true
+	);
 }
 
 void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* particle_color)
@@ -61,32 +125,13 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 	if (time <= 0)
 	{
 		// Firing firework
-		for (int i = 0; i < 30; i++)
-		{
-			//std::cout << "Firing firework..." << std::endl;
-			int idx = findUnusedParticle();
-			//std::cout << "last used: " << idx << std::endl;
-
-			float randX = getRandomNumber(-spread, spread);
-			float randZ = getRandomNumber(-spread, spread);
-
-			// Launching characteristics
-			particles[idx].pos = position;
-			particles[idx].life = 12.0f; // in seconds
-			particles[idx].speed = glm::vec3(randX, launchSpeed, randZ);
-			particles[idx].r = rand() % 256;
-			particles[idx].g = rand() % 256;
-			particles[idx].b = rand() % 256;
-			particles[idx].a = (rand() % 256) / 3;
-			particles[idx].size = (rand() % 1000) / 2000.0f + 0.25f;
-		}
+		launchFirework();
 
 		// Resetting for next launch
 		time = delay;
 	}
 
 	simulate(camera, particle_position, particle_color);
-	printf("particles: %d\n", particlesCount);
 	sortParticles();
 }
 

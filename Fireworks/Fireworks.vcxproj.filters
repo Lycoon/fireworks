@@ -33,7 +33,7 @@
     <ClCompile Include="VAO.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\OpenGL\glad.c">
+    <ClCompile Include="..\..\..\..\..\..\OpenGL\glad.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
