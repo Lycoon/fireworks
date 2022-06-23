@@ -60,7 +60,7 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 					updatedSize *= p.life / sparkleLife;
 					break;
 				case Particle::Type::TRAIL:
-					updatedSize *= p.life / trailSize;
+					updatedSize *= p.life / trailLife;
 					break;
 			}
 			particle_position[4 * particlesCount + 3] = updatedSize;
@@ -127,13 +127,14 @@ void Launcher::explode(Particle &p)
 		float randY = getRandomNumber(-1, 2);
 		float randZ = getRandomNumber(-1, 2);
 		float randSpread = getRandomNumber(0, explosionSpread);
+		float randLife = getRandomNumber(0, 2);
 
 		spawnParticle(
 			p.pos,
 			glm::normalize(glm::vec3(randX, randY, randZ)) * (explosionSize * (1 + randSpread)),
 			glm::vec4(p.r, p.g, p.b, p.a),
 			sparkleSize,
-			sparkleLife,
+			sparkleLife + randLife,
 			Particle::Type::SPARKLE
 		);
 	}

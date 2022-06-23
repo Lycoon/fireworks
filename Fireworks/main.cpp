@@ -108,7 +108,6 @@ int main()
     {
         Camera::updateDeltaTime();
         launcher.update(*camera, particle_position, particle_color);
-        printf("%f fps\n", 1.0f / Camera::getDeltaTime());
 
         processInput(window);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
