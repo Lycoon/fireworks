@@ -20,5 +20,6 @@ void main()
 		+ cameraUp * vertices.y * particleSize;
 
 	gl_Position = VP * vec4(vertexPosition, 1.0f);
+
 	fragmentColor = color;
 }

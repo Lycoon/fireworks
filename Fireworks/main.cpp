@@ -21,11 +21,11 @@ void processInput(GLFWwindow* window);
 
 float SCREEN_W = 1920.0f;
 float SCREEN_H = 1080.0f;
-float FOV = 45.0f;
+float FOV = 65.0f;
 float SENSITIVITY = 0.1f;
 
 const float NEAR_CLIP = 1.0f;
-const float FAR_CLIP = 500.0f;
+const float FAR_CLIP = 1000.0f;
 
 double lastXPos = SCREEN_W / 2, lastYPos = SCREEN_H / 2;
 double yaw = 0, pitch = 0, xPos, yPos;
@@ -108,9 +108,7 @@ int main()
     {
         Camera::updateDeltaTime();
         launcher.update(*camera, particle_position, particle_color);
-
-        std::cout << "pos: " << glm::to_string(camera->getPosition()) << std::endl;
-        std::cout << "dir: " << glm::to_string(camera->getDirection()) << std::endl;
+        printf("%f fps\n", 1.0f / Camera::getDeltaTime());
 
         processInput(window);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -207,7 +205,7 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 
     // Camera controls
-    // updateCameraRotation(window);
+    updateCameraRotation(window);
 
     if (heldKeys[GLFW_KEY_SPACE])
         camera->moveUp(2.0f);
