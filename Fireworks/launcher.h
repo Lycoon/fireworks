@@ -9,7 +9,7 @@
 
 #include "camera.h"
 
-static const unsigned int maxParticles = 100000;
+static const unsigned int maxParticles = 70000;
 static const float GRAVITY = 9.81f;
 
 static const char* explosionSounds[5] = { 
@@ -69,22 +69,22 @@ public:
 	static unsigned int particlesCount;
 
 private:
-	float launchDelay = 0.3f;       /* delay between each launch (seconds) */
-	float trailDelay = 0.05f;        /* delay between each trail spawn (seconds) */
+	float launchDelay = 0.2f;       /* delay between each launch (seconds) */
+	float trailDelay = 0.04f;        /* delay between each trail spawn (seconds) */
 
-	int sparklesPerExplosion = 400; /* Number of sparkles after explosion */
+	int sparklesPerExplosion = 300; /* Number of sparkles after explosion */
 	float sparkleLife = 1.0f;       /* lifetime of a sparkle (seconds) */
 	float sparkleSize = 1.3f;
 
 	float trailSize = 1.6f;         /* size of a trail */
 	float trailLife = 0.5f;         /* lifetime of a trail (seconds) */
 
-	float rocketSize = 0.9f;        /* size of a rocket */
+	float rocketSize = 0.6f;        /* size of a rocket */
 	float rocketLife = 8.5f;        /* lifetime of a rocket before exploding (seconds) */
 
 	/* Spread radius */
 	float explosionSize = 28.0f;    /* size of explosion blow */
-	float explosionSpread = 1.0f;   /* spread of explosion blow */
+	float explosionSpread = 10.0f;   /* spread of explosion blow */
 	float launchSpread = 12.0f;     /* spread of launch direction */
 	float launchSpeed = 95.0f;      /* speed of launch direction */
 

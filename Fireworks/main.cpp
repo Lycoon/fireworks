@@ -13,6 +13,7 @@
 #include "shader.h"
 #include "utils.h"
 #include "launcher.h"
+#include "image-loader.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -76,8 +77,13 @@ int main()
     camera = new Camera(glm::vec3(0.0f, 120.0f, -430.0f));
     projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
 
+    // Texture
+    ImageLoader img;
+    GLuint textureId = img.loadBMP_custom("textures/particle-transparent.bmp");
+
     // Shaders
     Shader particleShader("particle.vert", "particle.frag");
+    GLuint u_textureId = glGetUniformLocation(particleShader.id, "sampler");
 
     GLuint cameraRightId = glGetUniformLocation(particleShader.id, "cameraRight");
     GLuint cameraUpId = glGetUniformLocation(particleShader.id, "cameraUp");
@@ -102,10 +108,19 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 
     Launcher launcher;
+    int nbFrames = 0;
+    double lastTime = glfwGetTime();
 
     glClearColor(0, 0.1f, 0.2f, 0.8f);
     while (!glfwWindowShouldClose(window))
     {
+        nbFrames++;
+        if (glfwGetTime() - lastTime >= 1.0) {
+            printf("%i fps\n", nbFrames);
+            nbFrames = 0;
+            lastTime += 1.0;
+        }
+
         Camera::updateDeltaTime();
         launcher.update(*camera, particle_position, particle_color);
 
@@ -113,10 +128,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Projection
-        auto modelMatrix = glm::mat4(1.0);
         auto viewMatrix = camera->getWorldToViewMatrix();
         auto vp = projection * viewMatrix;
-        // auto mvp = vp * modelMatrix;
 
         // Updating particle position buffer
         glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
@@ -128,6 +141,11 @@ int main()
         glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, Launcher::particlesCount * sizeof(GLubyte) * 4, particle_color);
         
+        // Texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glUniform1i(u_textureId, 0);
+
         glEnable(GL_BLEND);
         particleShader.use();
 
@@ -171,6 +189,7 @@ int main()
     glDeleteBuffers(1, &particles_color_buffer);
     glDeleteBuffers(1, &particles_position_buffer);
     glDeleteBuffers(1, &billboard_vertex_buffer);
+    glDeleteTextures(1, &u_textureId);
     glDeleteVertexArrays(1, &VAO);
 
     glfwTerminate();

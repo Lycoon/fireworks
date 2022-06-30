@@ -4,6 +4,7 @@ layout(location = 0) in vec3 vertices;
 layout(location = 1) in vec4 particleInfo;
 layout(location = 2) in vec4 color;
 
+out vec2 UV;
 out vec4 fragmentColor;
 
 uniform vec3 cameraRight;
@@ -21,5 +22,6 @@ void main()
 
 	gl_Position = VP * vec4(vertexPosition, 1.0f);
 
+	UV = vertices.xy + vec2(0.5, 0.5);
 	fragmentColor = color;
 }

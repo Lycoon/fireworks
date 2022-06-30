@@ -121,17 +121,18 @@ void Launcher::explode(Particle &p)
 	int randomSound = getRandomNumber(1, 6);
 	soundEngine->play2D(explosionSounds[randomSound - 1]);
 
+	float randSize = getRandomNumber(0, explosionSpread);
 	for (int i = 0; i < sparklesPerExplosion; i++)
 	{
 		float randX = getRandomNumber(-1, 2);
 		float randY = getRandomNumber(-1, 2);
 		float randZ = getRandomNumber(-1, 2);
 		float randSpread = getRandomNumber(0, explosionSpread);
-		float randLife = getRandomNumber(0, 2);
+		float randLife = getRandomNumber(0, 1.5f);
 
 		spawnParticle(
 			p.pos,
-			glm::normalize(glm::vec3(randX, randY, randZ)) * (explosionSize * (1 + randSpread)),
+			glm::normalize(glm::vec3(randX, randY, randZ)) * (explosionSize - randSpread + randSize),
 			glm::vec4(p.r, p.g, p.b, p.a),
 			sparkleSize,
 			sparkleLife + randLife,
@@ -143,13 +144,14 @@ void Launcher::explode(Particle &p)
 void Launcher::launchFirework()
 {
 	int randomSound = getRandomNumber(1, 14);
-	//soundEngine->play2D(launchSounds[randomSound - 1]);
+	//soundEngine->play3D(launchSounds[randomSound - 1], vec3df(position.x, position.y, position.z));
 
 	float randX = getRandomNumber(-launchSpread, launchSpread);
 	float randZ = getRandomNumber(-launchSpread, launchSpread);
+	float rand = getRandomNumber(-150, 150);
 
 	spawnParticle(
-		position,
+		position + glm::vec3(rand, 0.0, 0.0),
 		glm::vec3(randX, getRandomNumber(launchSpeed, launchSpeed + 25), randZ),
 		getRandomBrightColor(),
 		rocketSize,
