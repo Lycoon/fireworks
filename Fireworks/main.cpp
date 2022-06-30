@@ -79,7 +79,7 @@ int main()
 
     // Texture
     ImageLoader img;
-    GLuint textureId = img.loadBMP_custom("textures/particle-transparent.bmp");
+    GLuint textureId = img.loadBMP_custom("textures/particle.bmp");
 
     // Shaders
     Shader particleShader("particle.vert", "particle.frag");
