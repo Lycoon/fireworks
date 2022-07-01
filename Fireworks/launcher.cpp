@@ -7,6 +7,7 @@ using namespace irrklang;
 ISoundEngine* soundEngine = createIrrKlangDevice();
 
 float getRandomNumber(float min, float max);
+glm::vec3 fadeColor(glm::vec3 startColor, glm::vec3 destColor, float ratio);
 glm::vec4 getRandomBrightColor();
 
 auto gravityForce = glm::vec3(0.0f, -GRAVITY, 0.0f);
@@ -53,21 +54,27 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 			particle_position[4 * particlesCount + 1] = p.pos.y;
 			particle_position[4 * particlesCount + 2] = p.pos.z;
 
-			float updatedSize = p.size;
+			float lifeRatio = 1.0f;
+			auto newColor = glm::vec3(p.r, p.g, p.b);
 			switch (p.type)
 			{
 				case Particle::Type::SPARKLE:
-					updatedSize *= p.life / sparkleLife;
+					lifeRatio = p.life / sparkleLife;
 					break;
 				case Particle::Type::TRAIL:
-					updatedSize *= p.life / trailLife;
+					lifeRatio = p.life / trailLife;
+					newColor = fadeColor(newColor, trailFade, lifeRatio);
+					break;
+				case Particle::Type::FOUNTAIN:
+					lifeRatio = p.life / fountainLife;
+					newColor = fadeColor(fountainColor, fountainFade, lifeRatio);
 					break;
 			}
-			particle_position[4 * particlesCount + 3] = updatedSize;
+			particle_position[4 * particlesCount + 3] = p.size * lifeRatio;
 
-			particle_color[4 * particlesCount + 0] = p.r;
-			particle_color[4 * particlesCount + 1] = p.g;
-			particle_color[4 * particlesCount + 2] = p.b;
+			particle_color[4 * particlesCount + 0] = newColor.r;
+			particle_color[4 * particlesCount + 1] = newColor.g;
+			particle_color[4 * particlesCount + 2] = newColor.b;
 			particle_color[4 * particlesCount + 3] = p.life;
 
 			particlesCount++;
@@ -84,10 +91,13 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 	}
 }
 
+
+
 void Launcher::renderTrails(Particle& p, float deltaTime)
 {
-	if (p.trailTime <= 0 && (p.type == Particle::Type::LAUNCHING || p.type == Particle::Type::SPARKLE))
+	if (p.trailTime <= 0 && (p.type == Particle::Type::SPARKLE || p.type == Particle::Type::LAUNCHING))
 	{
+
 		spawnParticle(
 			p.pos,
 			glm::vec3(0.0f),
@@ -143,21 +153,38 @@ void Launcher::explode(Particle &p)
 
 void Launcher::launchFirework()
 {
-	int randomSound = getRandomNumber(1, 14);
-	//soundEngine->play3D(launchSounds[randomSound - 1], vec3df(position.x, position.y, position.z));
-
 	float randX = getRandomNumber(-launchSpread, launchSpread);
 	float randZ = getRandomNumber(-launchSpread, launchSpread);
-	float rand = getRandomNumber(-150, 150);
+	float rand = getRandomNumber(-150.0f, 150.0f);
 
 	spawnParticle(
-		position + glm::vec3(rand, 0.0, 0.0),
+		position + glm::vec3(rand, 0.0, rand),
 		glm::vec3(randX, getRandomNumber(launchSpeed, launchSpeed + 25), randZ),
 		getRandomBrightColor(),
 		rocketSize,
 		rocketLife,
 		Particle::Type::LAUNCHING
 	);
+}
+
+void Launcher::launchFountain()
+{
+
+	for (int i = 0; i < fountainDensity; i++)
+	{
+		float randX = getRandomNumber(-fountainSpread, fountainSpread);
+		float randZ = getRandomNumber(-fountainSpread, fountainSpread);
+		float randY = getRandomNumber(-10.0f, 10.0f);
+
+		spawnParticle(
+			position,
+			glm::vec3(randX, fountainSpeed + randY, randZ),
+			glm::vec4(fountainColor, 1.0f),
+			fountainSize,
+			fountainLife,
+			Particle::Type::FOUNTAIN
+		);
+	}
 }
 
 void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* particle_color)
@@ -168,9 +195,14 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 	if (launchTime <= 0)
 	{
 		launchFirework();
-
-		// Resetting for next launch
 		launchTime = launchDelay;
+	}
+
+	fountainTime -= deltaTime;
+	if (fountainTime <= 0) 
+	{
+		launchFountain();
+		fountainTime = fountainDelay;
 	}
 
 	simulate(camera, particle_position, particle_color);
@@ -198,6 +230,15 @@ int Launcher::findUnusedParticle() {
 	}
 
 	return 0;
+}
+
+glm::vec3 fadeColor(glm::vec3 startColor, glm::vec3 destColor, float ratio)
+{
+	return { 
+		(ratio * startColor.r + (1.0f - ratio) * destColor.r) / 1.0f,
+		(ratio * startColor.g + (1.0f - ratio) * destColor.g) / 1.0f,
+		(ratio * startColor.b + (1.0f - ratio) * destColor.b) / 1.0f 
+	};
 }
 
 float getRandomNumber(float min, float max)
