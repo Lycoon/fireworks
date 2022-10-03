@@ -17,3 +17,8 @@ Check the YouTube video demo right [here](https://www.youtube.com/watch?v=0-K-u8
 - glm (OpenGL mathetmatics)
 - glad (OpenGL loading library)
 - irrKlang (sounds)
+
+## Authors
+
+- [Hugo BOIS](https://github.com/Lycoon)
+- [Erwan VIVIEN](https://github.com/erwanvivien)
