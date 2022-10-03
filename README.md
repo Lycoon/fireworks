@@ -1,9 +1,9 @@
 <p align="center">
-    <img src="banner.png" width="800" height="380">
+    <img src="banner.png" width="660" height="300">
 </p>
 
 <p align="center">
-  <img alt="GitHub license" src="https://img.shields.io/github/license/Lycoon/fireworks">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/Lycoon/fireworks">
   <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/Lycoon/fireworks">
 </p>
 
